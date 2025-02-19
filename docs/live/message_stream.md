@@ -370,7 +370,7 @@ while (!s.isclosed()) {
 | show_player_type | num  | 0?           |      |
 | user             | obj  | 用户相关信息 |      |
 
-`info[0[[15].extra` 表示的对象:
+`info[0][15].extra` 表示的对象:
 
 见下方 JSONC
 
@@ -780,7 +780,7 @@ while (!s.isclosed()) {
 | fans_medal | obj | 粉丝勋章 |  |
 | identities | num | 待调查 |  |
 | is_spread | num | 待调查 |  |
-| msg_type | num  | 1为进场，2为关注 |  |
+| msg_type | num  | 1为进场，2为关注，3为分享 |  |
 | roomid | num | 房间号 |  |
 | is_spread | num  | 待调查 |  |
 | is_spread | num  | 待调查 |  |
@@ -1673,7 +1673,7 @@ while (!s.isclosed()) {
 | ---- | ---- | ------ | --------- |
 | cmd | str | `NOTICE_MSG` |  |
 | id | num | 待调查 | |
-| name | str | 通知名 | |
+| name | str | 通知名 | 有概率不存在 |
 | full | obj | 完整显示信息? | |
 | half | obj | 半部显示信息? | | |
 | side | obj | 边缘显示信息? | |
@@ -1803,8 +1803,12 @@ while (!s.isclosed()) {
 | 字段 | 类型 | 内容   | 备注      |
 | ---- | ---- | ------ | --------- |
 | cmd | str | `PREPARING` | |
-| round | num | 轮播状态:<br/>1正在轮播<br/>0未轮播 | |
+| round | num | 轮播状态:<br/>1正在轮播<br/>0未轮播 | 开启轮播时存在 |
 | roomid | num | 直播间ID | 未知是真实ID还是短号 | |
+| msg\_id | str | 信息id? |  |
+| p\_is\_ack | bool |  | 未知 |
+| p\_msg\_type | num | `1` | 未知 |
+| send\_time | num | 发送时间 | UNIX 时间戳 |
 
 **示例:**
 
@@ -1830,12 +1834,12 @@ while (!s.isclosed()) {
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | cmd | str | `LIVE` |  |
-| live_key | str | ? |  |
+| live_key | str | 标记直播场次的key | 与开始直播接口获得的live_key相同 |
 | voice_background | str | ? |  |
 | sub_session_key | str | ? |  |
-| live_platform | str | 开播平台? |  |
+| live_platform | str | 开播平台? | 推测由开播接口决定 |
 | live_model | num | ? |  |
-| live_time | num | 开播时间 | UNIX 秒级时间戳 |
+| live_time | num | 开播时间 | UNIX 秒级时间戳，可能不存在 |
 | roomid | num | 直播间号 |  |
 
 **示例:**
@@ -3931,6 +3935,165 @@ while (!s.isclosed()) {
     "cur_fleet_num": 0,
     "max_fleet_num": 0
   }
+}
+```
+
+</details>
+
+#### 直播小助手? (ANCHOR_BROADCAST)
+
+第一次达到了某种条件下发。
+
+已知当在一个分区（中途不能切换）开播时长达到150、180、200、300分钟可能下发，直播间初次被分享1~2次时下发。
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `ANCHOR_BROADCAST` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| sender | str | 标题? | `直播小助手` |
+| msg | str | 提示消息 |  |
+| platform | num | 平台标识? | `0` |
+| button\_info | obj | 按钮信息? |  |
+| milestone\_type | str | 里程碑类型? | `session_livetime`，`first_share`，`session_share` |
+| milestone\_value | num | 里程值? |  |
+| milestone\_index | num | 里程碑类型的索引? | `1`，`5`，`6`，`7` |
+
+`data.button_info` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| button\_name | str |  |  |
+| blink_button_type | str |  |  |
+| blink_button_target | str |  |  |
+| blink_button_extra | str |  |  |
+| blink_button_label | num |  |  |
+| hime_button_type | str |  |  |
+| hime_button_target | str |  |  |
+| hime_button_extra | str |  |  |
+| hime\_button\_h5\_type | str |  |  |
+| hime_button_label | num |  |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "ANCHOR_BROADCAST",
+	"data": {
+		"sender": "直播小助手",
+		"msg": "恭喜你，开播时长达到180分钟！",
+		"platform": 0,
+		"button_info": {
+			"button_name": "",
+			"blink_button_type": "",
+			"blink_button_target": "",
+			"blink_button_extra": "",
+			"blink_button_label": 0,
+			"hime_button_type": "",
+			"hime_button_target": "",
+			"hime_button_extra": "",
+			"hime_button_h5_type": "",
+			"hime_button_label": 0
+		},
+		"milestone_type": "session_livetime",
+		"milestone_value": 10800,
+		"milestone_index": 6
+	}
+}
+```
+
+#### 直播小助手? (ANCHOR_HELPER_DANMU)
+
+几乎与`ANCHOR_BROADCAST`一同下发。
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `ANCHOR_HELPER_DANMU` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| sender | str | 标题? | `直播小助手` |
+| msg | str | 提示消息 |  |
+| platform | num | 平台标识? |  |
+| button\_platform | num |  |  |
+| button\_name | str |  |  |
+| button\_target | str |  |  |
+| button\_label | num |  |  |
+| report\_type | str | 上报类型? |  |
+| report | str |  |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "ANCHOR_HELPER_DANMU",
+	"data": {
+		"sender": "直播小助手",
+		"msg": "恭喜你，开播时长达到150分钟！",
+		"platform": 3,
+		"button_platform": 0,
+		"button_name": "",
+		"button_target": "",
+		"button_label": 0,
+		"report_type": "milestone",
+		"report": "session_livetime:5:9000"
+	}
+}
+```
+
+</details>
+
+#### ??? (RECALL_DANMU_MSG)
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `RECALL_DANMU_MSG` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| recall_type | num | 类型? | `2` |
+| target_id | num |  |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "RECALL_DANMU_MSG",
+	"data": {
+		"recall_type": 2,
+		"target_id": 525503743
+	}
 }
 ```
 
