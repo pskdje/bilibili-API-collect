@@ -1833,6 +1833,8 @@ while (!s.isclosed()) {
 
 #### 直播开始 (LIVE)
 
+注：请求了开始直播接口、开始向服务器推流时下发。
+
 **JSON消息:**
 
 根对象:
@@ -1845,7 +1847,7 @@ while (!s.isclosed()) {
 | sub_session_key | str | ? |  |
 | live_platform | str | 开播平台? | 推测由开播接口决定 |
 | live_model | num | ? |  |
-| live_time | num | 开播时间 | UNIX 秒级时间戳，可能不存在 |
+| live_time | num | 开播时间 | UNIX 秒级时间戳，只有请求了开始直播后立刻下发的那个数据包里存在 |
 | roomid | num | 直播间号 |  |
 
 **示例:**
@@ -3063,6 +3065,8 @@ while (!s.isclosed()) {
 </details>
 
 #### 直播间内容审核报告 (ROOM_CONTENT_AUDIT_REPORT)
+
+注：这个数据包需要更新直播间标题且使用主播的登录信息才会下发，更新直播间标题后一般不会立刻下发。
 
 **JSON消息:**
 
