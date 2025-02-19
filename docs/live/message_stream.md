@@ -1245,6 +1245,8 @@ while (!s.isclosed()) {
 }
 ```
 
+</details>
+
 #### 送礼 (SEND_GIFT)
 
 **JSON消息:**
@@ -1808,7 +1810,7 @@ while (!s.isclosed()) {
 | msg\_id | str | 信息id? |  |
 | p\_is\_ack | bool |  | 未知 |
 | p\_msg\_type | num | `1` | 未知 |
-| send\_time | num | 发送时间 | UNIX 时间戳 |
+| send\_time | num | 发送时间 | UNIX 毫秒时间戳 |
 
 **示例:**
 
@@ -1818,8 +1820,12 @@ while (!s.isclosed()) {
 ```json
 {
   "cmd": "PREPARING",
+  "msg_id": "26964930181741056:1000:1000",
+  "p_is_ack": true,
+  "p_msg_type": 1,
+  "roomid": "1899237171",
   "round": 1,
-  "roomid": "8618057"
+  "send_time": 1739985402716
 }
 ```
 
@@ -1834,7 +1840,7 @@ while (!s.isclosed()) {
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | cmd | str | `LIVE` |  |
-| live_key | str | 标记直播场次的key | 与开始直播接口获得的live_key相同 |
+| live_key | str | 标记直播场次的key | 与开始直播接口获得的live_key相同<br />注:编者实际获取到的`live_key`格式似乎与“直播间管理”文档不同 |
 | voice_background | str | ? |  |
 | sub_session_key | str | ? |  |
 | live_platform | str | 开播平台? | 推测由开播接口决定 |
@@ -1859,6 +1865,8 @@ while (!s.isclosed()) {
   "roomid": 23614753
 }
 ```
+
+</details>
 
 #### 主播信息更新 (ROOM_REAL_TIME_MESSAGE_UPDATE)
 
@@ -3006,17 +3014,19 @@ while (!s.isclosed()) {
 |    字段    | 类型 |  内容  |    备注   |
 | ---------- | --- | ------ | --------- |
 | title | str | 直播间标题 | |
-| area_id | num | 当前直播间所属分区的ID | |
-| parent_area_id | num | 待调查 | |
-| area_name | str | 当前直播间所属分区的名称 | |
-| parent_area_name | str | 待调查 | |
-| live_key | str | 待调查 | |
-| sub_session_key | str | 待调查 | |
+| area_id | num | 当前直播间所属二级分区的ID | |
+| parent_area_id | num |  当前直播间所属一级分区的ID | |
+| area_name | str | 当前直播间所属二级分区的名称 | |
+| parent_area_name | str |  当前直播间所属一级分区名称 | |
+| live_key | str | 标记直播场次的key | 未开播更新直播间信息时为`"0"` |
+| sub_session_key | str | 待调查 | 未开播更新直播间信息时为`""`(空字符串) |
 
 **示例:**
 
 <details>
 <summary>查看消息示例:</summary>
+
+已开播:
 
 ```json
 {
@@ -3030,6 +3040,66 @@ while (!s.isclosed()) {
         "live_key": "320830629635915849",
         "sub_session_key": "320830629635915849sub_time:1673690546"
     }
+}
+```
+
+未开播:
+
+```json
+{
+  "cmd": "ROOM_CHANGE",
+  "data": {
+    "title": "随缘",
+    "area_id": 216,
+    "parent_area_id": 6,
+    "area_name": "我的世界",
+    "parent_area_name": "单机游戏",
+    "live_key": "0",
+    "sub_session_key": ""
+  }
+}
+```
+
+</details>
+
+#### 直播间内容审核报告 (ROOM_CONTENT_AUDIT_REPORT)
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `ROOM_CONTENT_AUDIT_REPORT` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| audit_content_type | num | 审核内容类型? |  |
+| room\_id | num | 直播间ID | 未知是真实ID还是短号 |
+| anchor\_uid | num | 主播的用户mid |  |
+| audit\_status | num | 审核状态? |  |
+| audit\_title | str | 被审核的直播间标题 |  |
+| audit\_reason | str | 审核结果 |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "ROOM_CONTENT_AUDIT_REPORT",
+	"data": {
+		"audit_content_type": 1,
+		"room_id": 1899237171,
+		"anchor_uid": 438160221,
+		"audit_status": 2,
+		"audit_title": "崩坏学园2",
+		"audit_reason": "一审通过"
+	}
 }
 ```
 
@@ -4012,6 +4082,8 @@ while (!s.isclosed()) {
 	}
 }
 ```
+
+</details>
 
 #### 直播小助手? (ANCHOR_HELPER_DANMU)
 
