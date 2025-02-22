@@ -687,7 +687,7 @@ while (!s.isclosed()) {
 
 </details>
 
-#### 连续弹幕消息 (DM_INTERACTION)
+#### 交互信息合并 (DM_INTERACTION)
 
 注: 连续多条相同弹幕时触发
 
@@ -702,14 +702,21 @@ while (!s.isclosed()) {
 
 `data` 对象:
 
-| 字段   | 类型 | 内容     | 备注 |
-| ------ | ---- | -------- | ---- |
-| id     | num  | 事件 ID  |      |
-| status | num  | 状态     |      |
-| type   | num  | 事件类型 |      |
-| data   | str  | 事件数据 |      |
+| 字段     | 类型 | 内容     | 备注 |
+| -------- | ---- | -------- | ---- |
+| id       | num  | 事件 ID  |      |
+| status   | num  | 状态     |      |
+| type     | num  | 事件类型 | 102:弹幕<br />103:<br />104:送礼<br />105:分享<br />106:点赞 |
+| data     | str  | 事件数据 | 一个JSON字符串 |
+| dmsource | num  |          |      |
 
-`data.data` 对象:
+`data.data` 字符串对象:
+
+内容格式取决于`data.type`的类型，下面将按照`data.data(类型)`进行区分标记。
+
+温馨提示: 要记得先解析`data.data`内的JSON字符串，不要直接使用哦。
+
+`data.data(102)` 对象: (弹幕)
 
 | 字段                 | 类型  | 内容                 | 备注 |
 | -------------------- | ----- | -------------------- | ---- |
@@ -718,7 +725,7 @@ while (!s.isclosed()) {
 | card_appear_interval | num   | 弹窗出现时间间隔     |      |
 | send_interval        | num   | 发送时间间隔         |      |
 
-`data.data.combo[n]` 对象:
+`data.data(102).combo[n]` 对象:
 
 | 字段          | 类型 | 内容           | 备注          |
 | ------------- | ---- | -------------- | ------------- |
@@ -730,10 +737,47 @@ while (!s.isclosed()) {
 | left_duration | num  | 左移时长       |               |
 | fade_duration | num  | 淡化时长       |               |
 
+`data.data(104)` 对象: (送礼)
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| fade\_duration | num |  |  |
+| cnt | num | 投喂计数 |  |
+| card_appear_interval | num |  |  |
+| suffix\_text | str | 提示文本 | `人在投喂` |
+| reset\_cnt | num |  |  |
+| display\_flag | num |  |  |
+| gift\_id | num | 礼物 ID |  |
+| gift_alert_message | str |  |  |
+
+`data.data(105)` 对象: (分享)
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| fade\_duration | num |  |  |
+| cnt | num | 分享计数 |  |
+| card_appear_interval | num |  |  |
+| suffix\_text | str | 提示文本 | `人分享了直播间` |
+| reset\_cnt | num |  |  |
+| display\_flag | num |  |  |
+
+`data.data(106)` 对象: (点赞)
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| fade\_duration | num |  |  |
+| cnt | num | 点赞计数 |  |
+| card_appear_interval | num |  |  |
+| suffix\_text | str | 提示文本 | `人正在点赞` |
+| reset\_cnt | num |  |  |
+| display\_flag | num |  |  |
+
 **示例:**
 
 <details>
 <summary>查看正文示例:</summary>
+
+type===102
 
 ```json
 {
@@ -759,6 +803,51 @@ while (!s.isclosed()) {
       "send_interval": 1000
     }
   }
+}
+```
+
+type===104
+
+```json
+{
+	"cmd": "DM_INTERACTION",
+	"data": {
+		"data": "{\"fade_duration\":10000,\"cnt\":5,\"card_appear_interval\":0,\"suffix_text\":\"人在投喂\",\"reset_cnt\":0,\"display_flag\":1,\"gift_id\":33988,\"gift_alert_message\":\"投喂一个%s支持主播\"}",
+		"dmscore": 36,
+		"id": 85744481752576,
+		"status": 5,
+		"type": 104
+	}
+}
+```
+
+type===105
+
+```json
+{
+	"cmd": "DM_INTERACTION",
+	"data": {
+		"data": "{\"fade_duration\":10000,\"cnt\":1,\"card_appear_interval\":0,\"suffix_text\":\"人分享了直播间\",\"reset_cnt\":0,\"display_flag\":1}",
+		"dmscore": 36,
+		"id": 85743053669888,
+		"status": 4,
+		"type": 105
+	}
+}
+```
+
+type===106
+
+```json
+{
+	"cmd": "DM_INTERACTION",
+	"data": {
+		"data": "{\"fade_duration\":10000,\"cnt\":11,\"card_appear_interval\":0,\"suffix_text\":\"人正在点赞\",\"reset_cnt\":1,\"display_flag\":1}",
+		"dmscore": 36,
+		"id": 66159395305984,
+		"status": 5,
+		"type": 106
+	}
 }
 ```
 
@@ -1812,7 +1901,7 @@ while (!s.isclosed()) {
 | ---- | ---- | ------ | --------- |
 | cmd | str | `PREPARING` | |
 | round | num | 轮播状态:<br/>1正在轮播<br/>0未轮播 | 开启轮播时存在 |
-| roomid | num | 直播间ID | 未知是真实ID还是短号 | |
+| roomid | str | 直播间ID | 未知是真实ID还是短号 | 类型似乎从num改为str |
 | msg\_id | str | 信息id? |  |
 | p\_is\_ack | bool |  | 未知 |
 | p\_msg\_type | num | `1` | 未知 |
@@ -1822,7 +1911,9 @@ while (!s.isclosed()) {
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
+有启用轮播:
+
 ```json
 {
   "cmd": "PREPARING",
@@ -1832,6 +1923,19 @@ while (!s.isclosed()) {
   "roomid": "1899237171",
   "round": 1,
   "send_time": 1739985402716
+}
+```
+
+未启用轮播:
+
+```json
+{
+  "cmd": "PREPARING",
+  "msg_id": "27040425357932032:1000:1000",
+  "p_is_ack": true,
+  "p_msg_type": 1,
+  "roomid": "1017",
+  "send_time": 1740129398337
 }
 ```
 
@@ -1860,7 +1964,7 @@ while (!s.isclosed()) {
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "LIVE",
@@ -2019,6 +2123,45 @@ while (!s.isclosed()) {
 }
 ```
   
+</details>
+
+#### 未登录通知 (LOG_IN_NOTICE)
+
+注：未使用认证信息进行登录将会下发此数据包，通常于认证包回复后下发；部分受到豁免的直播间不会下发。
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `LOG_IN_NOTICE` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| notice\_msg | str | 通知内容 |  |
+| image\_web | str | 在网页端使用的通知图片 |  |
+| image\_app | str | 在app端使用的图片 | (未确认) |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "LOG_IN_NOTICE",
+	"data": {
+		"notice_msg": "为保护用户隐私，未登录无法查看他人昵称",
+		"image_web": "http://i0.hdslb.com/bfs/dm/75e7c16b99208df259fe0a93354fd3440cbab412.png",
+		"image_app": "http://i0.hdslb.com/bfs/dm/b632f7dcd3acf47deffb5f9ccc9546ae97a3415b.png"
+	}
+}
+```
+
 </details>
 
 #### 用户到达直播间高能榜前三名的消息 (ONLINE_RANK_TOP3)
