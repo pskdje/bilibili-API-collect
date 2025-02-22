@@ -6,6 +6,10 @@
 
 *请求方法: GET*
 
+认证方式: Cookie(SESSDATA)
+
+可以选择进行认证，若未认证视作未登录，将会受到限制，详见后续内容。
+
 **URL参数：**
 
 | 参数名 | 类型 | 内容         | 必要性 | 备注 |
@@ -100,7 +104,7 @@ curl -G 'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo' \
 
 **注: 特别的**, WS 与 WSS 连接地址带有路径 `/sub`, 如 `wss://broadcastlv.chat.bilibili.com:443/sub`.
 
-**再注:** B 站更新了隐私政策, 连接建立 5 分钟左右, 若该连接认证时传入信息来自未登录用户, 会提示 `为保护用户隐私，未注册登陆用户将无法查看他人昵称`, 随后所有发送弹幕的用户 mid 都为 `0`, 用户名部分也使用 `*` 保护, 参见 [#732](https://github.com/SocialSisterYi/bilibili-API-collect/issues/732)
+**再注:** B 站更新了隐私政策, 连接建立后, 若该连接认证时传入信息来自未登录用户, 会提示 `为保护用户隐私，未注册登陆用户将无法查看他人昵称`, 随后部分数据包（如“弹幕”、“进场或关注消息”）的用户 mid 都为 `0`, 用户名部分也使用 `*` 保护, 部分房间受到豁免, 参见 [#732](https://github.com/SocialSisterYi/bilibili-API-collect/issues/732)
 
 操作流程 (伪代码):
 
@@ -149,6 +153,8 @@ while (!s.isclosed()) {
 *方向: 上行*
 
 注: 连接成功后 5 秒内发送, 否则强制断开连接
+
+再注: 若`uid`字段填写的是用户mid，则通过`获取信息流认证密钥`接口使用的认证信息所属用户mid必须与`uid`字段相同，否则强制断开连接。
 
 **JSON正文:**
 
