@@ -1770,7 +1770,7 @@ type===106
 | ---- | ---- | ------ | --------- |
 | cmd | str | `NOTICE_MSG` |  |
 | id | num | 待调查 | |
-| name | str | 通知名 | 有概率不存在 |
+| name | str | 通知名 |  |
 | full | obj | 完整显示信息? | |
 | half | obj | 半部显示信息? | | |
 | side | obj | 边缘显示信息? | |
@@ -4334,6 +4334,55 @@ type===106
     "url": "https://live.bilibili.com/p/html/live-lottery/anchor-join.html?is_live_half_webview=1&hybrid_biz=live-lottery-anchor&hybrid_half_ui=1,5,100p,100p,000000,0,30,0,0,1;2,5,100p,100p,000000,0,30,0,0,1;3,5,100p,100p,000000,0,30,0,0,1;4,5,100p,100p,000000,0,30,0,0,1;5,5,100p,100p,000000,0,30,0,0,1;6,5,100p,100p,000000,0,30,0,0,1;7,5,100p,100p,000000,0,30,0,0,1;8,5,100p,100p,000000,0,30,0,0,1",
     "web_url": "https://live.bilibili.com/p/html/live-lottery/anchor-join.html"
   }
+}
+```
+
+</details>
+
+#### 天选时刻通知 (ANCHOR_LOT_NOTICE)
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `ANCHOR_LOT_NOTICE` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| notice\_type | num | 通知卡片类型? |  |
+| lottery\_card | obj | 通知卡片内容 |  |
+
+`data.lottery_card` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| show\_time | num | 显示时间? |  |
+| button\_text | str | 按钮文本? |  |
+| icon | str | 图标 |  |
+| title | str | 标题? |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"data": {
+		"notice_type": 1,
+		"lottery_card": {
+			"show_time": 30,
+			"button_text": "去发奖",
+			"icon": "https://i0.hdslb.com/bfs/live/95970204111233f181fc28622502aaf1a9359b9a.png",
+			"title": "发天选有助于人气累积"
+		}
+	},
+	"cmd": "ANCHOR_LOT_NOTICE"
 }
 ```
 
