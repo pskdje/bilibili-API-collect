@@ -4472,6 +4472,63 @@ type===106
 
 </details>
 
+#### 语音连麦开关 (VOICE_JOIN_SWITCH)
+
+在直播姬开关连麦功能时下发。
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| cmd | str | `VOICE_JOIN_SWITCH` |  |
+| data | obj | 信息本体 |  |
+| room_id | num | 直播间id |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| room_id | num | 直播间id |  |
+| room_status | num | 连麦开关状态 |  |
+| root_status | num | 连麦开关状态 |  |
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+开:
+
+```json
+{
+	"cmd": "VOICE_JOIN_SWITCH",
+	"data": {
+		"room_id": 1899237171,
+		"room_status": 1,
+		"root_status": 1
+	},
+	"room_id": 1899237171
+}
+```
+
+关:
+
+```json
+{
+	"cmd": "VOICE_JOIN_SWITCH",
+	"data": {
+		"room_id": 1899237171,
+		"room_status": 0,
+		"root_status": 0
+	},
+	"room_id": 1899237171
+}
+```
+
+</details>
+
 #### 邀请视频连线 (VIDEO_CONNECTION_JOIN_START)
 
 **示例:**
@@ -4614,7 +4671,7 @@ type===106
 
 第一次达到了某种条件下发。
 
-已知当在一个分区（中途不能切换）开播时长达到150、180、200、300分钟可能下发，直播间初次被分享1~2次时下发。
+已知当在一个分区（中途不能切换）开播时长达到150、180、200、300、360、400分钟可能下发，直播间初次被分享1~2次时下发。
 
 **JSON消息:**
 
