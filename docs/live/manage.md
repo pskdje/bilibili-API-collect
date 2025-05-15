@@ -93,7 +93,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/preLive/CreateRoom' \
 | 参数名  | 类型 | 内容                     | 必要性 | 备注                 |
 | ------- | ---- | ------------------------ | ------ | -------------------- |
 | csrf    | str  | CSRF Token（位于cookie） | 必要   |                      |
-| csrf_token | str  | CSRF Token（位于 cookie） | 可选 |                       |
+| csrf_token | str  | CSRF Token（位于 cookie） | 非必要 |                       |
 | platform | str | 平台标识                 | 非必要 |      |
 | visit_id | str | (?)                      | 非必要 | 某种标识？      |
 | room_id | num  | 直播间id                 | 必要   | 必须为自己的直播间id |
@@ -111,7 +111,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/preLive/CreateRoom' \
 | code    | num    | 返回值   | 0：成功<br />-1：操作太频繁<br />1：错误<br />3：未登录或鉴权失败<br />405：不允许的请求方法<br />60009：分区已下线<br />65530：token错误（登录错误）<br /> |
 | msg     | str    | 错误信息 | 默认为ok                                               |
 | message | str    | 错误信息 | 默认为ok                                               |
-| data    | obj | 信息本体 | 部分失败情况下是`[]`（空数组）                                       |
+| data    | obj    | 信息本体 | 部分失败情况下是`[]`（空数组）                             |
 
 `data`对象：
 
