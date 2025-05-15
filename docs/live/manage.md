@@ -97,9 +97,9 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/preLive/CreateRoom' \
 | platform | str | 平台标识                 | 非必要 |      |
 | visit_id | str | (?)                      | 非必要 | 某种标识？      |
 | room_id | num  | 直播间id                 | 必要   | 必须为自己的直播间id |
-| title   | str  | 直播间标题               | 非必要 | 最大20字符           |
+| title   | str  | 直播间标题               | 非必要 | 开播设置界面上限20个字符 |
 | area\_id | num | 直播分区id（子分区id）  | 非必要 | 详见[直播分区](live_area.md) |
-| add\_tag | str | 要添加的标签          | 非必要 |      |
+| add\_tag | str | 要添加的标签          | 非必要 | 开播设置界面上限10个字符 |
 | del\_tag | str | 要删除的标签          | 非必要 | 若存在`add_tag`时不起作用 |
 
 **json回复：**
@@ -108,7 +108,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/preLive/CreateRoom' \
 
 | 字段    | 类型   | 内容     | 备注                                                   |
 | ------- | ------ | -------- | ------------------------------------------------------ |
-| code    | num    | 返回值   | 0：成功<br />1：错误<br />3：未登录或鉴权失败<br />405：不允许的请求方法<br />60009：分区已下线<br />65530：token错误（登录错误）<br /> |
+| code    | num    | 返回值   | 0：成功<br />-1：操作太频繁<br />1：错误<br />3：未登录或鉴权失败<br />405：不允许的请求方法<br />60009：分区已下线<br />65530：token错误（登录错误）<br /> |
 | msg     | str    | 错误信息 | 默认为ok                                               |
 | message | str    | 错误信息 | 默认为ok                                               |
 | data    | obj | 信息本体 | 部分失败情况下是`[]`（空数组）                                       |
@@ -347,7 +347,7 @@ curl 'https://api.live.bilibili.com/room/v1/Room/update' \
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| isp | str | 互联网服务提供商 |  |
+| isp | str | 主播的互联网服务提供商 |  |
 
 **示例：**
 
