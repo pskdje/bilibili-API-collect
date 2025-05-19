@@ -348,7 +348,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDo
 ```
 
 <details>
-<summary></summary>
+<summary>查看响应示例：</summary>
 
 ```json
 {
@@ -550,3 +550,32 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 ```
 
 </details>
+
+## 下载整场直播回放的流程
+
+1. 先[请求整场直播回放下载链接](#请求整场直播回放下载链接)接口，让它开始合成回放；
+
+2. (可选)请求[获取回放的信息](#获取回放的信息)接口，生成合成进度页面；
+
+3. [轮询回放合成状态](#轮询回放合成状态)，当状态变为`30`转到4流程，变为`-30`转到5流程；
+
+4. 再次[请求整场直播回放下载链接](#请求整场直播回放下载链接)，获取下载链接并下载。
+
+5. 请求[获取直播回放列表](#获取直播回放列表)，刷新页面并根据信息提示失败。
+
+## 直播回放剪辑页面
+
+通过此处的链接可以打开web直播回放剪辑页面。
+
+> https://live.bilibili.com/web-cut/quick-publish.html
+
+**url查询参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| start_time | num | 直播开始时间 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].start_time` |
+| end_time | num | 直播结束时间 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].end_time` |
+| live_key | str | 标记直播场次的key | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].live_key` |
+| cover | str | 封面 | 非必要 | 可以自定义封面，或者在[获取直播回放列表](#获取直播回放列表)使用直播封面 |
+
+**示例链接：** https://live.bilibili.com/web-cut/quick-publish.html?start_time=1747508293&end_time=1747508499&live_key=609041817764368179&cover=https%3A%2F%2Fi0.hdslb.com%2Fbfs%2Flive%2F59fc254c1f51a962dbf69ae85e4920f2f6fb8dcd.png
