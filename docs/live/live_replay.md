@@ -39,10 +39,10 @@
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| replay_id | num | 回放id？ |  |
+| replay_id | num | 直播回放id |  |
 | live_info | obj | 直播信息 |  |
 | video_info | obj | 回放视频信息 |  |
-| alarm_info | obj | 警报信息? |  |
+| alarm_info | obj | 警报信息 |  |
 | room_id | num | 直播间id |  |
 | live_key | str | 标记直播场次的key |  |
 | start_time | num | 直播开始秒时间戳 | 调用开始直播接口的时间 |
@@ -61,18 +61,19 @@
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| replay_status | num | (?) | 作用尚不明确 |
-| estimated_time | str | (?) | `1970-01-01 08:00:00` |
+| replay_status | num | 回放状态 | 作用尚不明确 |
+| estimated_time | str | 直播回放合成结束时间 | 未合成时为`"1970-01-01 08:00:00"` |
 | duration | num | 直播时长 | 单位秒 |
-| alert_code | num | (?) | 作用尚不明确 |
-| alert_message | str | (?) | 作用尚不明确 |
+| download_url | str | 下载链接片段 | 建议通过[请求整场直播回放下载链接](#请求整场直播回放下载链接)来获取下载链接 |
+| alert_code | num | 快速检查警告代码 | 整场直播回放合成失败时不存在 |
+| alert_message | str | 快速检查警告信息 | 整场直播回放合成失败时不存在 |
 
 `data.replay_info[i].alarm_info` 对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| code | num | (?) |  |
-| message | str | (?) |  |
+| code | num | 回放合成警报代码 |  |
+| message | str | 回放合成错误信息 |  |
 | cur_time | num | 当前时间戳 | Unix秒时间戳 |
 | is_ban_publish | bool | 是否禁止发布? |  |
 
@@ -273,6 +274,277 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetVide
     "page": 1,
     "page_size": 3,
     "total": 347
+  }
+}
+```
+
+</details>
+
+## 请求整场直播回放下载链接
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDownload
+
+*请求方法: POST*
+
+认证方式: Cookie (SESSDATA)
+
+鉴权方式: Cookie中`bili_jct`的值正确并与`csrf`相同
+
+未生成整场直播回放时将进行生成。
+
+**正文参数（ application/x-www-form-urlencoded ）：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| record_id | num | 直播回放id | 必要（可选） | `record_id`和`live_key`必选其一 |
+| live_key | str | 标记直播场次的key | 必要（可选） | `record_id`和`live_key`必选其一 |
+| csrf_token | str | CSRF Token（位于cookie） | 非必要 |  |
+| csrf | str | CSRF Token（位于cookie） | 必要 |  |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -101：未登录<br />-111：csrf校验失败<br />0：成功<br />100：非法参数<br />210：回放id或场次key无效 |
+| message | str | 错误信息 |  |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| record | obj | 回放状态 |  |
+| download_url | str | 回放下载链接 | 完成时存在 |
+| download_url_list | arr | 回放下载链接列表 | 完成时存在 |
+
+`data.record` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| uid | num | 用户mid |  |
+| record_id | num | 直播回放id |  |
+| status | num | 回放状态 |  |
+| estimated_time | num | 预计结束时间 | Unix秒时间戳 |
+| current_time | num | 当前时间 | Unix秒时间戳 |
+| merge_time | num | 开始合并时间 | Unix秒时间戳 |
+| toast | str | 提示信息 | 失败时存在 |
+
+`data.download_url_list` 数组：
+
+| 项 | 类型 | 内容 | 备注 |
+| -- | --- | --- | --- |
+| 0 | str | 回放下载链接 |  |
+
+**示例：**
+
+请求回放id为`10597910`的下载链接
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDownload' \
+  --data-urlencode 'record_id=10597910' \
+  --data-urlencode 'live_key=607942821532667699' \
+  -b 'SESSDATA=xxx;bili_jct=xxx'
+```
+
+<details>
+<summary></summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "record": {
+      "uid": 438160221,
+      "record_id": 10597910,
+      "status": 30,
+      "estimated_time": 1747639543,
+      "current_time": 1747639106,
+      "merge_time": 1747638665
+    },
+    "download_url": "https://upos-sz-mirrorali.bilivideo.com/ugcever/n250519sa3hkpirw61hjskuit4d9fdsj.mp4?deadline=1747682306&gen=record2vod&os=upos&trid=da40b42594d5446da29cb0d2b2f25f45&uparams=deadline,gen,os,trid&upsig=c6ac5f218af40b2c120b3f5add2e4d6b&attname=直播回放_2025-05-13_20-49-04.mp4",
+    "download_url_list": [
+      "https://upos-sz-mirrorali.bilivideo.com/ugcever/n250519sa3hkpirw61hjskuit4d9fdsj.mp4?deadline=1747682306&gen=record2vod&os=upos&trid=da40b42594d5446da29cb0d2b2f25f45&uparams=deadline,gen,os,trid&upsig=c6ac5f218af40b2c120b3f5add2e4d6b&attname=直播回放_2025-05-13_20-49-04.mp4"
+    ]
+  }
+}
+```
+
+</details>
+
+## 获取回放的信息
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoUidRecordsSubsect
+
+*请求方法: GET*
+
+认证方式: Cookie (SESSDATA)
+
+**url参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| record_id | num | 直播回放id | 必要 |  |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -400：参数错误<br />-101：未登录<br />0：成功 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 | 失败时不可用 |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| list | arr | 回放信息列表 |  |
+
+`data.list` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| uid | num | 用户mid |  |
+| record_id | num | 直播回放id |  |
+| title | str | 直播标题 |  |
+| cover | str | 直播封面 |  |
+| status | num | 回放状态 |  |
+| start\_time | num | 直播开始时间 | Unix秒时间戳 |
+| end_time | num | 直播结束时间 | Unix秒时间戳 |
+
+**示例：**
+
+获取回放id为`10707664`的信息
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoUidRecordsSubsect?record_id=10707664' \
+  -b 'SESSDATA=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "list": [
+      {
+        "uid": 438160221,
+        "record_id": 10707664,
+        "title": "摆",
+        "cover": "https://i0.hdslb.com/bfs/live/59fc254c1f51a962dbf69ae85e4920f2f6fb8dcd.png",
+        "status": 2,
+        "start_time": 1747508293,
+        "end_time": 1747508499
+      }
+    ]
+  }
+}
+```
+
+</details>
+
+## 轮询回放合成状态
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoUidRecord
+
+*请求方法: POST*
+
+认证方式: Cookie (SESSDATA)
+
+鉴权方式: Cookie中`bili_jct`的值正确并与`csrf`相同
+
+**正文参数（ application/x-www-form-urlencoded ）：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| records | str | 直播回放id列表 | 必要 | 用`,`分隔 |
+| csrf_token | str | CSRF Token（位于cookie） | 非必要 |  |
+| csrf | str | CSRF Token（位于cookie） | 必要 |  |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -101：未登录<br />-400：参数错误<br />0：成功 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| list | arr | 查询结果 | 无效的id会被忽略 |
+
+`data.list` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| uid | num | 用户mid |  |
+| record_id | num | 直播回放id |  |
+| status | num | 回放状态 |  |
+| current_time | num | 当前时间戳 | Unix秒时间戳 |
+| estimated_time | num | 预计结束时间戳 | 初次[请求回放下载链接](#请求整场直播回放下载链接)后存在 |
+| merge_time | num | 合成开始时间戳 | 初次[请求回放下载链接](#请求整场直播回放下载链接)后存在 |
+
+**示例：**
+
+查询各种回放id
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoUidRecord' \
+  --data-urlencode 'records=10727160,10597910,10687720,10230000,99999999' \
+  --data-urlencode 'csrf=xxx' \
+  -b 'SESSDATA=xxx;bili_jct=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "list": [
+      {
+        "uid": 91089731,
+        "record_id": 10230000,
+        "status": 2,
+        "current_time": 1747641604
+      },
+      {
+        "uid": 438160221,
+        "record_id": 10597910,
+        "status": 30,
+        "estimated_time": 1747639543,
+        "current_time": 1747641604,
+        "merge_time": 1747638665
+      },
+      {
+        "uid": 438160221,
+        "record_id": 10687720,
+        "status": -30,
+        "estimated_time": 1747635525,
+        "current_time": 1747641604,
+        "merge_time": 1747635486,
+        "toast": "因直播过程中存在推流质量问题（网络波动或丢包），本场直播回放无法合成"
+      },
+      {
+        "uid": 3493299121817771,
+        "record_id": 10727160,
+        "status": 2,
+        "current_time": 1747641604
+      }
+    ]
   }
 }
 ```
