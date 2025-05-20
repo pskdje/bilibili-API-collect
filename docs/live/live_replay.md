@@ -45,8 +45,8 @@
 | alarm_info | obj | 警报信息 |  |
 | room_id | num | 直播间id |  |
 | live_key | str | 标记直播场次的key |  |
-| start_time | num | 直播开始秒时间戳 | 调用开始直播接口的时间 |
-| end_time | num | 直播结束秒时间戳 | 调用结束直播接口的时间 |
+| start_time | num | 直播开始秒时间戳 | 调用[开始直播](manage.md#开始直播)接口的时间 |
+| end_time | num | 直播结束秒时间戳 | 调用[关闭直播](manage.md#关闭直播)接口的时间 |
 
 `data.replay_info[i].live_info` 对象：
 
@@ -584,7 +584,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| list | arr | 直播回放视频列表 |  |
+| list | arr | 直播回放视频列表 | 如果该场回放没有视频流将为`null` |
 
 `data.list` 数组中的对象：
 
@@ -595,13 +595,277 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 | stream | str | 直播回放视频流 |  |
 | type | num | 类型? | 2：一般回放? |
 
+**示例：**
+
+获取某个场次的视频流
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetSliceStream?live_key=607113721045847859&start_time=1746863101&end_time=1746879299' \
+  -b 'SESSDATA=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "list": [
+      {
+        "start_time": 1746863103,
+        "end_time": 1746879246,
+        "stream": "https://bvc-live.bilivideo.com/hls-record-gateway/videoPlay?biz_id=live2vod-clip&end_time=1746879246&header_name=1746863103.m4s&host_id=edge-hls-bvc-self-cn-jsyz-ct-03-59-6d854b4bd8-gnlb7&no_end=0&schema=https&sign=12f649dd540096672745d60b84f18eda&start_time=1746863103&stream_name=live_438160221_32373699&ts=1752930893&version=2",
+        "type": 2
+      },
+      {
+        "start_time": 1746879267,
+        "end_time": 1746879269,
+        "stream": "https://bvc-live.bilivideo.com/hls-record-gateway/videoPlay?biz_id=live2vod-clip&end_time=1746879269&header_name=1746863104.m4s&host_id=edge-hls-bvc-self-cn-jsyz-ct-03-59-6d854b4bd8-gnlb7&no_end=0&schema=https&sign=5c63605f1fa88561a6257b6812725b4f&start_time=1746879267&stream_name=live_438160221_32373699&ts=1752930893&version=2",
+        "type": 2
+      },
+      {
+        "start_time": 1746879269,
+        "end_time": 1746879298,
+        "stream": "https://bvc-live.bilivideo.com/hls-record-gateway/videoPlay?biz_id=live2vod-clip&end_time=1746879298&header_name=1746863105.m4s&host_id=edge-hls-bvc-self-cn-jsyz-ct-03-59-6d854b4bd8-gnlb7&no_end=0&schema=https&sign=70929627354f4380b54b97fcdb69c8a2&start_time=1746879269&stream_name=live_438160221_32373699&ts=1752930893&version=2",
+        "type": 2
+      }
+    ]
+  }
+}
+```
+
+</details>
+
+## 获取直播会话数据
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetLiveSessionData
+
+*请求方法: GET*
+
+认证方式: Cookie (SESSDATA)
+
+**url参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| live_key | str | 标记直播场次的key | 必要 |  |
+| start_tm | str | 开始时间 | 必要 | 格式为`yyyy-mm-dd+HH:MM:SS`，时区为`UTC+08:00`（中国标准时间）；取值对实际无影响 |
+| end_tm | str | 开始时间 | 必要 | 格式为`yyyy-mm-dd+HH:MM:SS`，时区为`UTC+08:00`（中国标准时间）；取值对实际无影响 |
+| web_location | str | (?) |  |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -500：服务器错误<br />-101：未登录<br />0：成功<br />100：非法参数<br />202：场次无效 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| session_data | arr | 会话数据 |  |
+| max_danmaku | num | 弹幕最多的时间戳 | Unix秒时间戳，没有则为`0` |
+| max_pcu | num | 进房最多的时间戳 | Unix秒时间戳，没有则为`0` |
+| max_value | num | (?) | 效果未知 |
+| high_light_data | arr | 高光时刻数据 |  |
+| ass_url | str | ASS字幕链接 | 用作弹幕显示 |
+
+`data.session_data` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| ts | num | 采样时间 | Unix秒时间戳 |
+| value | num | 弹幕数量 |  |
+
+`data.high_light_data` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| id | num | 高光id |  |
+| type | num | 高光类型 | 1：弹幕<br />2：进房 |
+| start_time | num | 高光开始时间戳 | Unix秒时间戳 |
+| end_time | num | 高光结束时间戳 | Unix秒时间戳 |
+| title | str | 高光提示标题 |  |
+| cover | str | (?) | 目前为`""` |
+| extra | str | (?) | 目前为`""` |
+
+**示例：**
+
+获取场次key为`607113721045847859`的会话数据
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetLiveSessionData?live_key=607113721045847859&start_tm=0000-01-01+00:00:00&end_tm=1970-01-01+00:00:00' \
+  -b 'SESSDATA=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```jsonc
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "session_data": [
+      {
+        "ts": 1746863100,
+        "value": 0
+      },
+      {
+        "ts": 1746863160,
+        "value": 0
+      },
+      {
+        "ts": 1746863220,
+        "value": 0
+      },
+      {
+        "ts": 1746863280,
+        "value": 0
+      },
+      {
+        "ts": 1746863340,
+        "value": 0
+      },
+      {
+        "ts": 1746863400,
+        "value": 0
+      },
+      {
+        "ts": 1746863460,
+        "value": 0
+      },
+      {
+        "ts": 1746863520,
+        "value": 0
+      },
+      {
+        "ts": 1746863580,
+        "value": 0
+      },
+      {
+        "ts": 1746863640,
+        "value": 0
+      },
+      {
+        "ts": 1746863700,
+        "value": 0
+      },
+      {
+        "ts": 1746863760,
+        "value": 0
+      },
+      {
+        "ts": 1746863820,
+        "value": 0
+      },
+      // 省略100多条数据
+      {
+        "ts": 1746878520,
+        "value": 0
+      },
+      {
+        "ts": 1746878580,
+        "value": 0
+      },
+      {
+        "ts": 1746878640,
+        "value": 0
+      },
+      {
+        "ts": 1746878700,
+        "value": 0
+      },
+      {
+        "ts": 1746878760,
+        "value": 0
+      },
+      {
+        "ts": 1746878820,
+        "value": 0
+      },
+      {
+        "ts": 1746878880,
+        "value": 0
+      },
+      {
+        "ts": 1746878940,
+        "value": 0
+      },
+      {
+        "ts": 1746879000,
+        "value": 0
+      },
+      {
+        "ts": 1746879060,
+        "value": 0
+      },
+      {
+        "ts": 1746879120,
+        "value": 0
+      },
+      {
+        "ts": 1746879180,
+        "value": 0
+      },
+      {
+        "ts": 1746879240,
+        "value": 0
+      }
+    ],
+    "max_danmaku": 1746864660,
+    "max_pcu": 1746864660,
+    "max_value": 0,
+    "high_light_data": [
+      {
+        "id": 6226272,
+        "type": 1,
+        "start_time": 1746873300,
+        "end_time": 1746873480,
+        "title": "弹幕高光 Top 1",
+        "cover": "",
+        "extra": ""
+      },
+      {
+        "id": 6226274,
+        "type": 1,
+        "start_time": 1746873120,
+        "end_time": 1746873420,
+        "title": "弹幕高光 Top 2",
+        "cover": "",
+        "extra": ""
+      },
+      {
+        "id": 6226271,
+        "type": 2,
+        "start_time": 1746864600,
+        "end_time": 1746864780,
+        "title": "进房高光时刻",
+        "cover": "",
+        "extra": ""
+      }
+    ],
+    "ass_url": "https://jssz-boss.hdslb.com/live2arc_anchor_video/dmass_1899237171_607113721045847859.ass?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=y4zI4XTQzlOkmSKg%2F20250520%2Fjssz%2Fs3%2Faws4_request&X-Amz-Date=20250520T130358Z&X-Amz-Expires=7200&X-Amz-SignedHeaders=host&X-Amz-Signature=5e3ddfbcb8893dc6e76deea7981165e18e5df9a7579f4e6e97c7a32abec53d84"
+  }
+}
+```
+
+</details>
+
 ## 下载整场直播回放的流程
 
 1. 先[请求整场直播回放下载链接](#请求整场直播回放下载链接)接口，让它开始合成回放；
 
 2. (可选)请求[获取回放的信息](#获取回放的信息)接口，生成合成进度页面；
 
-3. [轮询回放合成状态](#轮询回放合成状态)，当状态变为`30`转到4流程，变为`-30`转到5流程；
+3. [轮询回放合成状态](#轮询回放合成状态)，当状态变为`30`转到流程4，变为`-30`转到流程5；
 
 4. 再次[请求整场直播回放下载链接](#请求整场直播回放下载链接)，获取下载链接并下载。
 
