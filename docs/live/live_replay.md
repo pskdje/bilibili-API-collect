@@ -64,7 +64,7 @@
 | replay_status | num | 回放状态 | 作用尚不明确 |
 | estimated_time | str | 直播回放合成结束时间 | 未合成时为`"1970-01-01 08:00:00"` |
 | duration | num | 直播时长 | 单位秒 |
-| download_url | str | 下载链接片段 | 建议通过[请求整场直播回放下载链接](#请求整场直播回放下载链接)来获取下载链接 |
+| download_url | str | 下载链接片段 | 整场直播回放合成成功时存在<br />建议通过[请求整场直播回放下载链接](#请求整场直播回放下载链接)来获取下载链接 |
 | alert_code | num | 快速检查警告代码 | 整场直播回放合成失败时不存在 |
 | alert_message | str | 快速检查警告信息 | 整场直播回放合成失败时不存在 |
 
@@ -553,6 +553,47 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 ```
 
 </details>
+
+## 获取切片视频流
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetSliceStream
+
+*请求方法: GET*
+
+认证方式: Cookie (SESSDATA)
+
+**url参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| live_key | str | 标记直播场次的key | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].live_key` |
+| start_time | num | 直播开始时间戳 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].start_time` |
+| end_time | num | 直播结束时间戳 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].end_time` |
+| web_location | str | (?) | 非必要 |  |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -400：参数缺失<br />-101：未登录<br />0：成功<br />100：非法参数<br />202：场次无效 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| list | arr | 直播回放视频列表 |  |
+
+`data.list` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| start_time | num | 片段开始时间戳 | Unix秒时间戳 |
+| end_time | num | 片段结束时间戳 | Unix秒时间戳 |
+| stream | str | 直播回放视频流 |  |
+| type | num | 类型? | 2：一般回放? |
 
 ## 下载整场直播回放的流程
 
