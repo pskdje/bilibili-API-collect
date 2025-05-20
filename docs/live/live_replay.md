@@ -211,12 +211,15 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetRepl
 | av_title | str | 切片标题 |  |
 | av_cover | str | 切片封面 |  |
 | av_status | num | 切片状态 | 1：发布中<br />2：已投稿<br />3：投稿失败 |
+| avid | num | 切片视频的avid | 状态为2时存在 |
 | ctime | str | 切片创建时间 |  |
 | start_tm | str | 切片开始时间 |  |
 | end_tm | str | 切片结束时间 |  |
 | av_duration | num | 切片时长 | 状态为2时存在 |
 | failed_reason | str | 失败原因 | 状态为3时存在，2024-09-01前发布失败的切片可能不存在 |
 | live_type | num | (?) | 作用尚不明确 |
+| cnt_play | num | 播放数 | 视频有播放时存在；若该页出现任意状态不为2的项也会不存在 |
+| cnt_danmaku | num | 弹幕数 | 视频有弹幕时存在；若该页出现任意状态不为2的项也会不存在 |
 
 **示例：**
 
@@ -306,7 +309,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetVide
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | code | num | 返回值 | -101：未登录<br />-111：csrf校验失败<br />0：成功<br />100：非法参数<br />210：回放id或场次key无效 |
-| message | str | 错误信息 |  |
+| message | str | 错误信息 | 成功时为`"0"` |
 | ttl | num | `1` |  |
 | data | obj | 信息本体 |  |
 
