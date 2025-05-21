@@ -859,6 +859,90 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetLiveSessio
 
 </details>
 
+## 获取某个时间的视频帧
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoKeyFrame
+
+*请求方法: POST*
+
+认证方式: Cookie (SESSDATA)
+
+鉴权方式: Cookie中`bili_jct`的值正确并与`csrf`相同
+
+**url参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| csrf | str | CSRF Token（位于cookie） | 必要 |  |
+
+**正文参数（ application/json ）：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| live_key | str | 标记直播场次的key | 必要 |  |
+| time_list | str | 秒时间戳列表，用`,`分隔 | 必要 | 时间间隔低于30秒将会导致只提供部分内容 |
+
+**json回复：**
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -400：请求错误<br />-111：csrf校验失败<br />-101：未登录<br />0：成功 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| list | arr | 指定时间的视频帧列表 | 场次key无效时为`null` |
+
+`data.list` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| ts | num | 时间戳 | 对应请求的`time_list`其中某一个 |
+| url | str | 该时间的视频帧 | 该时间有视频时存在 |
+
+**示例：**
+
+获取某场直播的视频帧
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVideoKeyFrame?csrf=xxx' \
+  -H 'Content-Type: application/json' \
+  -b 'SESSDATA=xxx;bili_jct=xxx' \
+  -d '{"live_key":"609431465787395891","time_list":"174758900,1747658930,1747658960"}'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "list": [
+      {
+        "ts": 174758900
+      },
+      {
+        "ts": 1747658930,
+        "url": "https://jssz-boss.hdslb.com/live2arc_anchor_video/live_438160221_32373699_20250519204900.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=y4zI4XTQzlOkmSKg%2F20250520%2Fjssz%2Fs3%2Faws4_request&X-Amz-Date=20250520T180202Z&X-Amz-Expires=7200&X-Amz-SignedHeaders=host&X-Amz-Signature=8d42a3d5fd1995e5e2bf98d453a986bec48529a9ae97d5d7eedee8a59b22418a"
+      },
+      {
+        "ts": 1747658960,
+        "url": "https://jssz-boss.hdslb.com/live2arc_anchor_video/live_438160221_32373699_20250519205001.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=y4zI4XTQzlOkmSKg%2F20250520%2Fjssz%2Fs3%2Faws4_request&X-Amz-Date=20250520T180202Z&X-Amz-Expires=7200&X-Amz-SignedHeaders=host&X-Amz-Signature=f4a3803d4147492ced14eefbb6953e772b886e195d51dbfac800e77320adeba2"
+      }
+    ]
+  }
+}
+```
+
+</details>
+
 ## 下载整场直播回放的流程
 
 1. 先[请求整场直播回放下载链接](#请求整场直播回放下载链接)接口，让它开始合成回放；
