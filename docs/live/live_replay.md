@@ -19,6 +19,8 @@
 
 **json回复：**
 
+根对象：
+
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | code | num | 返回值 | 0：成功<br />-101：未登录 |
@@ -187,6 +189,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetRepl
 
 **json回复：**
 
+根对象：
+
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | code | num | 返回值 | 0：成功<br />-101：未登录 |
@@ -283,6 +287,174 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetVide
 
 </details>
 
+## 获取回放剪辑草稿列表
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetDraftList
+
+*请求方法: GET*
+
+认证方式: Cookie (SESSDATA)
+
+**url参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| page | num | 页码 | 非必要 | 默认第1页 |
+| page_size | num | 每页内容数量 | 非必要 | 默认30项，最大30项 |
+
+**json回复：**
+
+根对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -101：未登录<br />0：成功 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| draft_info | arr | 草稿信息 | 无结果时为`null` |
+| pagination | obj | 分页信息 |  |
+
+`data.draft_info` 数组中的对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| id | num | 回放剪辑id |  |
+| title | str | 回放剪辑标题 |  |
+| cover | str | 回放剪辑封面 | 有封面时存在；若不存在将使用 https://s1.hdslb.com/bfs/static/blive/blfe-link-center/static/img/default.187078d.png |
+| live\_key | str | 标记直播场次的key |  |
+| ctime | str | 回放剪辑创建时间 |  |
+| live_start_time | str | 直播开始时间 |  |
+| live_end_time | str | 直播结束时间 |  |
+| live_type | num | (?) | 作用尚不明确 |
+
+`data.pagination` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| page | num | 请求的页码 |  |
+| page_size | num | 内容数量 |  |
+| total | num | 总计内容数量 |  |
+
+**示例：**
+
+请求自己的回放剪辑草稿列表
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetDraftList?page=1&page_size=12' \
+  -b 'SESSDATA=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "draft_info": [
+      {
+        "id": 988275,
+        "title": "直播场次 2025-05-19 20:45:04",
+        "live_key": "609431465787395891",
+        "ctime": "2025-05-22 01:08:20",
+        "live_start_time": "2025-05-19 20:45:04",
+        "live_end_time": "2025-05-20 09:40:13",
+        "live_type": 1
+      },
+      {
+        "id": 987665,
+        "title": "直播场次 2025-05-19 20:45:04 切片",
+        "cover": "http://i0.hdslb.com/bfs/live/9bdf1df3d823734c59382120a9a7c10b177dbefd.png",
+        "live_key": "609431465787395891",
+        "ctime": "2025-05-21 20:28:48",
+        "live_start_time": "2025-05-19 20:45:04",
+        "live_end_time": "2025-05-20 09:40:13",
+        "live_type": 1
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "page_size": 30,
+      "total": 2
+    }
+  }
+}
+```
+
+</details>
+
+## 删除某个回放剪辑草稿
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/DeleteSliceDraft
+
+*请求方法: POST*
+
+认证方式: Cookie (SESSDATA)
+
+鉴权方式: Cookie中`bili_jct`的值正确并与`csrf`相同
+
+**正文参数（ application/x-www-form-urlencoded ）：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| draft_id | num | 回放剪辑id | 必要 |  |
+| csrf_token | str | CSRF Token（位于cookie） | 非必要 |  |
+| csrf | str | CSRF Token（位于cookie） | 必要 |  |
+
+**json回复：**
+
+根对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -400：参数错误<br />-101：未登录<br />-111：csrf校验失败<br />0：成功<br />206：无可操作草稿 |
+| message | str | 错误信息 | 成功时为`"0"` |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 |  |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | `0` |  |
+| message | str | `""` |  |
+
+**示例：**
+
+删除回放剪辑id为`988275`的草稿
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/DeleteSliceDraft' \
+  --data-urlencode 'draft_id=988275' \
+  --data-urlencode 'csrf=xxx'
+  -b 'SESSDATA=xxx;bili_jct=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data": {
+    "code": 0,
+    "message": ""
+  }
+}
+```
+
+</details>
+
 ## 请求整场直播回放下载链接
 
 > https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDownload
@@ -305,6 +477,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetVide
 | csrf | str | CSRF Token（位于cookie） | 必要 |  |
 
 **json回复：**
+
+根对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
@@ -347,6 +521,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetVide
 curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDownload' \
   --data-urlencode 'record_id=10597910' \
   --data-urlencode 'live_key=607942821532667699' \
+  --data-urlencode 'csrf=xxx' \
   -b 'SESSDATA=xxx;bili_jct=xxx'
 ```
 
@@ -392,6 +567,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorVideoDo
 | record_id | num | 直播回放id | 必要 |  |
 
 **json回复：**
+
+根对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
@@ -472,6 +649,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 | csrf | str | CSRF Token（位于cookie） | 必要 |  |
 
 **json回复：**
+
+根对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
@@ -573,6 +752,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 
 **json回复：**
 
+根对象：
+
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
 | code | num | 返回值 | -400：参数缺失<br />-101：未登录<br />0：成功<br />100：非法参数<br />202：场次无效 |
@@ -657,6 +838,8 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetSliceStrea
 | web_location | str | (?) |  |
 
 **json回复：**
+
+根对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
@@ -877,12 +1060,16 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetLiveSessio
 
 **正文参数（ application/json ）：**
 
+根对象：
+
 | 参数名 | 类型 | 内容 | 必要性 | 备注 |
 | ----- | --- | ---- | ----- | --- |
 | live_key | str | 标记直播场次的key | 必要 |  |
 | time_list | str | 秒时间戳列表，用`,`分隔 | 必要 | 时间间隔低于30秒将会导致只提供部分内容 |
 
 **json回复：**
+
+根对象：
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
