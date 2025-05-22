@@ -211,7 +211,7 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorGetRepl
 
 | 字段 | 类型 | 内容 | 备注 |
 | --- | --- | --- | --- |
-| silce_id | num | 切片id？ |  |
+| silce_id | num | 切片id |  |
 | av_title | str | 切片标题 |  |
 | av_cover | str | 切片封面 |  |
 | av_status | num | 切片状态 | 1：发布中<br />2：已投稿<br />3：投稿失败 |
@@ -1130,7 +1130,84 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 
 </details>
 
+## 投稿直播回放片段
+
+> https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorPublishVideoSlice
+
+*请求方法: POST*
+
+认证方式: Cookie (SESSDATA)
+
+鉴权方式: Cookie中`bili_jct`的值正确并与`csrf`相同
+
+**正文参数（ application/x-www-form-urlencoded ）：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| live_key | str | 标记直播场次的key | 必要 |  |
+| start_ts | num | 开始时间戳 | 必要 | 开始和结束时间目前相差不能大于2小时 |
+| end_ts | num | 结束时间戳 | 必要 | 开始和结束时间目前相差不能大于2小时 |
+| av_title | str | 切片标题 | 必要 | 不能与现有标题重复 |
+| av_cover | str | 切片封面URL | 必要 |  |
+| av_highlight | num | 高光绑定? | 非必要 |  |
+| with_subtitle | num | 是否自动生成字幕? | 非必要 | 效果不明确 |
+| with_danmaku | num | 是否带弹幕? | 非必要 | 传递`1`时可能导致处于“发布中”状态时不在[获取已发布片段的信息](#获取已发布片段的信息)中显示 |
+| csrf | str | CSRF Token（位于cookie） | 必要 |  |
+
+**json回复：**
+
+根对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| code | num | 返回值 | -111：csrf校验失败<br />-101：未登录<br />0：成功<br />4000：时长过长<br />4001：操作太快<br />4006：标题已使用 |
+| message | str | 错误信息 |  |
+| ttl | num | `1` |  |
+| data | obj | 信息本体 | 成功时有效 |
+
+`data` 对象：
+
+| 字段 | 类型 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| video_slice_id | num | 切片id |  |
+
+**示例：**
+
+为某个场次投稿切片
+
+```shell
+curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/AnchorPublishVideoSlice' \
+  --data-urlencode 'live_key=609431465787395891' \
+  --data-urlencode 'start_ts=1747680306' \
+  --data-urlencode 'end_ts=1747687506' \
+  --data-urlencode 'av_title=2025051920' \
+  --data-urlencode 'av_cover=https://i0.hdslb.com/bfs/live/59fc254c1f51a962dbf69ae85e4920f2f6fb8dcd.png' \
+  --data-urlencode 'av_highlight=0' \
+  --data-urlencode 'with_subtitle=0' \
+  --data-urlencode 'with_danmaku=0' \
+  --data-urlencode 'csrf=xxx' \
+  -b 'SESSDATA=xxx;bili_jct=xxx'
+```
+
+<details>
+<summary>查看响应示例：</summary>
+
+```json
+{
+  "code": 0,
+  "message": "0",
+  "ttl": 1,
+  "data":{
+    "video_slice_id": 898374
+  }
+}
+```
+
+</details>
+
 ## 下载整场直播回放的流程
+
+此处的流程是从[直播回放](https://link.bilibili.com/#/my-room/live-record)的“下载回放”功能得出的。
 
 1. 先[请求整场直播回放下载链接](#请求整场直播回放下载链接)接口，让它开始合成回放；
 
@@ -1142,9 +1219,9 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 
 5. 请求[获取直播回放列表](#获取直播回放列表)，刷新页面并根据信息提示失败。
 
-## 直播回放剪辑页面
+## 直播回放片段发布页面
 
-通过此处的链接可以打开web直播回放剪辑页面。
+通过此处的链接可以打开web直播回放片段发布页面。
 
 > https://live.bilibili.com/web-cut/quick-publish.html
 
@@ -1155,6 +1232,23 @@ curl 'https://api.live.bilibili.com/xlive/app-blink/v1/anchorVideo/GetAnchorVide
 | start_time | num | 直播开始时间 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].start_time` |
 | end_time | num | 直播结束时间 | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].end_time` |
 | live_key | str | 标记直播场次的key | 必要 | 对应[获取直播回放列表](#获取直播回放列表)的`data.replay_info[i].live_key` |
-| cover | str | 封面 | 非必要 | 可以自定义封面，或者在[获取直播回放列表](#获取直播回放列表)使用直播封面 |
+| cover | str | 封面URL | 非必要 | 可以自定义封面，或者在[获取直播回放列表](#获取直播回放列表)使用直播封面 |
 
 **示例链接：** https://live.bilibili.com/web-cut/quick-publish.html?start_time=1747508293&end_time=1747508499&live_key=609041817764368179&cover=https%3A%2F%2Fi0.hdslb.com%2Fbfs%2Flive%2F59fc254c1f51a962dbf69ae85e4920f2f6fb8dcd.png
+
+## 直播回放剪辑页面
+
+此链接用于打开直播回放轻剪辑页面，在点击[直播回放片段发布页面](#直播回放片段发布页面)的“高级剪辑工具”或某一个[回放剪辑草稿](#获取回放剪辑草稿列表)后自动打开。
+
+> https://live.bilibili.com/web-cut/index.html
+
+**url查询参数：**
+
+| 参数名 | 类型 | 内容 | 必要性 | 备注 |
+| ----- | --- | ---- | ----- | --- |
+| start_time | num | 直播开始时间戳 | 必要 | 用于[获取切片视频流](#获取切片视频流) |
+| end_time | num | 直播结束时间戳 | 必要 | 用于[获取切片视频流](#获取切片视频流) |
+| live_key | str | 标记直播场次的key | 必要 | 用于[获取切片视频流](#获取切片视频流) |
+| draft_id | num | 回放剪辑id | 必要 |  |
+
+**示例链接：** https://live.bilibili.com/web-cut/index.html?start_time=1747658704&end_time=1747705213&live_key=609431465787395891&draft_id=988275
