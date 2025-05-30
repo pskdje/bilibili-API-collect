@@ -104,7 +104,7 @@ curl -G 'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo' \
 
 **注: 特别的**, WS 与 WSS 连接地址带有路径 `/sub`, 如 `wss://broadcastlv.chat.bilibili.com:443/sub`.
 
-**再注:** B 站更新了隐私政策, 连接建立后, 若该连接认证时传入信息来自未登录用户, 会提示 `为保护用户隐私，未注册登陆用户将无法查看他人昵称`, 随后部分数据包（如“弹幕”、“进场或关注消息”）的用户 mid 都为 `0`, 用户名部分也使用 `*` 保护, 部分房间受到豁免, 参见 [#732](https://github.com/SocialSisterYi/bilibili-API-collect/issues/732)
+**再注:** B 站更新了隐私政策, 连接建立后, 若该连接认证时传入信息来自未登录用户, 会提示 `为保护用户隐私，未注册登陆用户将无法查看他人昵称`, 随后部分数据包（如“弹幕”、“用户交互消息”）的用户 mid 都为 `0`, 用户名部分也使用 `*` 保护, 部分房间受到豁免, 参见 [#732](https://github.com/SocialSisterYi/bilibili-API-collect/issues/732)
 
 操作流程 (伪代码):
 
@@ -937,9 +937,9 @@ type===106
 
 </details>
 
-#### 进场或关注消息 (INTERACT_WORD)
+#### 用户交互消息 (INTERACT_WORD)
 
-注: 有用户进入直播间或关注主播时触发
+注: 有用户进入直播间、关注主播、分享直播间时触发
 
 **JSON消息:**
 
