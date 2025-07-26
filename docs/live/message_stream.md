@@ -2107,7 +2107,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "ROOM_REAL_TIME_MESSAGE_UPDATE",
@@ -2216,7 +2216,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "ONLINE_RANK_COUNT",
@@ -2296,7 +2296,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "ONLINE_RANK_TOP3",
@@ -2339,7 +2339,7 @@ type===106
 
 <details>
 <summary>查看消息示例：</summary>
-  
+
 ```json
 {
   "cmd": "POPULAR_RANK_CHANGED",
@@ -2577,7 +2577,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "LIKE_INFO_V3_CLICK",
@@ -2638,7 +2638,7 @@ type===106
 
 <details>
 <summary>查看消息示例：</summary>
-  
+
 ```json
 {
   "cmd": "LIKE_INFO_V3_UPDATE",
@@ -2688,7 +2688,7 @@ type===106
 | wait_num | num | 待调查 | |
 
 `data.awards[n]` 对象:
-  
+
 |    字段    | 类型 |  内容  |    备注   |
 | ---------- | --- | ------ | --------- |
 | gift_id | num | 礼物ID | |
@@ -2782,7 +2782,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "POPULARITY_RED_POCKET_NEW",
@@ -2873,10 +2873,10 @@ type===106
 | award_pic     | str  | 礼物图标 URL |      |
 | award_big_pic | str  | 礼物大图 URL |      |
 | award_price   | num  | 礼物价值     |      |
-  
+
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "POPULARITY_RED_POCKET_WINNER_LIST",
@@ -2961,7 +2961,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "WATCHED_CHANGE",
@@ -3032,7 +3032,7 @@ type===106
 
 <details>
 <summary>查看消息示例：</summary>
-  
+
 ```json
 {
 	"cmd": "ENTRY_EFFECT",
@@ -3275,7 +3275,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "AREA_RANK_CHANGED",
@@ -3602,7 +3602,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "WIDGET_BANNER",
@@ -3872,7 +3872,7 @@ type===106
 
 <details>
 <summary>查看消息示例:</summary>
-  
+
 ```json
 {
   "cmd": "STOP_LIVE_ROOM_LIST",
