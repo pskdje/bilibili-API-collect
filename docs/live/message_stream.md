@@ -3800,25 +3800,25 @@ type===106
 | ---------- | --- | ------ | --------- |
 | biz_id | num | 待调查 | |
 | content_segments | array | 文本分段 | |
-| danmaku_style | obj | 文本样式信息 | |
+| danmaku_style | obj | 文本样式信息 | 可能不存在 |
 | danmaku_url | str | 待调查 | |
 | dmscore | num | 待调查 | |
-| terminals | array | 待调查 | |
+| terminals | array | 指定显示的终端 | 数字数组 |
 
 `data.content_segments[n]` 数组中的对象
 
 |    字段    | 类型 |  内容  |    备注   |
 | ---------- | --- | ------ | --------- |
-| background_color | arr 或 null | 背景颜色? | 字符串数组 |
-| background_color_dark | arr 或 null | 深色模式背景颜色? |  |
-| font_bold | bool | text 字段是否加粗? |  |
+| background_color | arr 或 null | 背景颜色? | 字符串数组，可能不存在 |
+| background_color_dark | arr 或 null | 深色模式背景颜色? | 可能不存在 |
+| font_bold | bool | text 字段是否加粗? | 可能不存在 |
 | font_color | str | text 字段的十六进制颜色值 |  |
-| font_color_dark | str | text 字段的十六进制颜色值 | APP端设置为深色模式时使用 |
-| highlight_font_color | str | text 字段高亮部分的十六进制颜色值? |  |
-| highlight_font_color_dark | str | text 字段高亮部分的十六进制颜色值? | 深色模式时使用 |
-| img_height | num | 图片高度 |  |
-| img_url | str | 图片链接 |  |
-| img_width | str | 图片宽度 |  |
+| font_color_dark | str | text 字段的十六进制颜色值 | APP端设置为深色模式时使用，可能不存在 |
+| highlight_font_color | str | text 字段高亮部分的十六进制颜色值? | 可能不存在 |
+| highlight_font_color_dark | str | text 字段高亮部分的十六进制颜色值? | 深色模式时使用，可能不存在 |
+| img_height | num | 图片高度 | 可能不存在 |
+| img_url | str | 图片链接 | 可能不存在 |
+| img_width | str | 图片宽度 | 可能不存在 |
 | text | str | 文本 |  |
 | type | num | 文本组件类型 | 1：普通文本<br />2：图片<br />3：链接 |
 | uri | str | 链接 | 文本组件类型为 `3` 时存在 |
