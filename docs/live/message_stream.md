@@ -2783,7 +2783,10 @@ type===106
 
 | 字段 | 类型 | 内容   | 备注      |
 | ---- | ---- | ------ | --------- |
-| count | num | 直播间高能用户数量 | |
+| count | num | 直播间高能用户数量 | 存在上限 |
+| count_text | str | 直播间高能用户数量文本 |  |
+| online_count | num | 直播间在线用户数量 | 存在上限 |
+| online_count_text | str | 直播间在线用户数量文本 |  |
 
 **示例:**
 
@@ -2792,10 +2795,13 @@ type===106
 
 ```json
 {
-  "cmd": "ONLINE_RANK_COUNT",
-  "data": {
-    "count": 4
-  }
+	"cmd": "ONLINE_RANK_COUNT",
+	"data": {
+		"count": 1084,
+		"count_text": "1084",
+		"online_count": 1084,
+		"online_count_text": "1084"
+	}
 }
 ```
 
