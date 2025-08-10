@@ -339,6 +339,10 @@ while (!s.isclosed()) {
 | cmd   | str   | `DANMU_MSG` |      |
 | dm_v2 | str   | 空串?       |      |
 | info  | array | 弹幕信息    | 感谢 [#1084](https://github.com/SocialSisterYi/bilibili-API-collect/issues/1084) 补充 |
+| msg_id | str | 弹幕id?      | 极低概率存在 |
+| p_is_ack | bool |          | 极低概率存在 |
+| p_msg_type | num |         | 极低概率存在 |
+| send_time | num | 发送时间戳 | Unix 毫秒时间戳，极低概率存在 |
 
 `info` 数组:
 
