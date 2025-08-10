@@ -964,6 +964,8 @@ type===106
 
 注: 有用户进入直播间、关注主播、分享直播间时触发
 
+已被`INTERACT_WORD_V2`替换。
+
 **JSON消息:**
 
 根对象:
@@ -971,7 +973,7 @@ type===106
 | 字段 | 类型 | 内容   | 备注      |
 | ---- | ---- | ------ | --------- |
 | cmd  | str  | `INTERACT_WORD`        |  |
-| data | obj  | 进入直播间的用户的信息 |  |
+| data | obj  | 用户交互信息 |  |
 
 `data` 对象:
 
@@ -1040,6 +1042,47 @@ type===106
     "uname": "TIM_Init",
     "uname_color": ""
   }
+}
+```
+
+</details>
+
+#### 用户交互消息V2 (INTERACT_WORD_V2)
+
+注: 该cmd已将`INTERACT_WORD`替换
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容   | 备注      |
+| ---- | ---- | ------ | --------- |
+| cmd  | str  | `INTERACT_WORD_V2` |  |
+| data | obj  | 信息本体 |  |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| ---- | ---- | ---- | ---- |
+| dmscore | num |  |  |
+| pb | str | 使用 base64 编码 protobuf 后的数据 | 解析后数据基本与`INTERACT_WORD`的`data`相同 |
+
+用于解析protobuf数据的proto文件: [#1332(comment)](https://github.com/SocialSisterYi/bilibili-API-collect/issues/1332#issuecomment-3047237367)
+
+注: 先用 base64 解码 `data.pb` 内的字符串为字节数据pb，再使用proto文件解码pb数据。
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "INTERACT_WORD_V2",
+	"data": {
+		"dmscore": 3,
+		"pb": "CJTwwNEBEgpTdGFyU2VhMjQ2IgIDASgBMNWgITispaTDBkDUubHe/jJKLAiv8CkQEhoG55Sf5oCBIKS6ngYopLqeBjCkup4GOKS6ngZAAWDVoCFo9JQRYgB4gZ/v1tmc1qcYmgEAsgHPAQiU8MDRARJYCgpTdGFyU2VhMjQ2EkpodHRwczovL2kwLmhkc2xiLmNvbS9iZnMvZmFjZS8xMDliNzg3YzVmMTEzYzRhM2M3NDE1YmI5YmY2YjgyYmMzM2JjNGUyLmpwZxpnCgbnlJ/mgIEQEhikup4GIKS6ngYopLqeBjCkup4GOP/hAUgBUK/wKWD0lBF6CSNEQzZCNkI5OYIBCSNEQzZCNkI5OYoBCSNEQzZCNkI5OZIBCSNGRkZGRkZGRpoBCSM4MTAwMUY5OSICCAkyALoBAA=="
+	}
 }
 ```
 
@@ -2613,6 +2656,8 @@ type===106
 
 注: 直播间高能用户数据刷新
 
+在线榜已被 `ONLINE_RANK_V3` 替换
+
 **JSON消息:**
 
 根对象:
@@ -2627,7 +2672,7 @@ type===106
 | 字段 | 类型 | 内容   | 备注      |
 | ---- | ---- | ------ | --------- |
 | list | array | 在直播间高能用户中的用户信息 | |
-| rank_type | str | 待调查 | |
+| rank_type | str | 榜单类型 |  |
 
 `data.list[n]` 对象:
 
@@ -2639,6 +2684,8 @@ type===106
 | uname | str | 用户名称 | |
 | rank | num | 该用户在高能榜中的排名 | |
 | guard_level | num | 大航海等级? | |
+| is_mystery | bool |  |  |
+| uinfo | obj | 用户信息 |  |
 
 **示例:**
 
@@ -2677,6 +2724,45 @@ type===106
         ],
         "rank_type": "gold-rank"
     }
+}
+```
+
+</details>
+
+#### 直播间高能榜V3 (ONLINE_RANK_V3)
+
+注: 直播间高能用户数据刷新
+
+替换 `ONLINE_RANK_V2`
+
+**JSON消息:**
+
+根对象:
+
+| 字段 | 类型 | 内容 | 备注 |
+| ---- | ---- | ---- | ---- |
+| cmd | str | `ONLINE_RANK_V3` |  |
+| data | obj | 数据本体 | |
+
+`data` 对象:
+
+| 字段 | 类型 | 内容   | 备注      |
+| ---- | ---- | ------ | --------- |
+| pb | str | 使用 base64 编码 protobuf 后的数据 | 解析后数据基本与`ONLINE_RANK_V2`的`data`相同 |
+
+用于解析protobuf数据的proto文件: [#1332(comment)](https://github.com/SocialSisterYi/bilibili-API-collect/issues/1332#issuecomment-3055621742)
+
+**示例:**
+
+<details>
+<summary>查看消息示例:</summary>
+
+```json
+{
+	"cmd": "ONLINE_RANK_V3",
+	"data": {
+		"pb": "CgtvbmxpbmVfcmFuaxqqAwi8jscKEkpodHRwczovL2kyLmhkc2xiLmNvbS9iZnMvZmFjZS9iODM3MGMzMGM3ZDg5NDg4YjRjOWYyNWZmMTgyNjc4OTEyYTRiOTA3LmpwZxoCMTIiDOW4jOWwlOWonOWonCgBMAFCwAIIvI7HChKfAgoM5biM5bCU5aic5aicEkpodHRwczovL2kyLmhkc2xiLmNvbS9iZnMvZmFjZS9iODM3MGMzMGM3ZDg5NDg4YjRjOWYyNWZmMTgyNjc4OTEyYTRiOTA3LmpwZypaCgzluIzlsJTlqJzlqJwSSmh0dHBzOi8vaTIuaGRzbGIuY29tL2Jmcy9mYWNlL2I4MzcwYzMwYzdkODk0ODhiNGM5ZjI1ZmYxODI2Nzg5MTJhNGI5MDcuanBnMloKDOW4jOWwlOWonOWonBJKaHR0cHM6Ly9pMi5oZHNsYi5jb20vYmZzL2ZhY2UvYjgzNzBjMzBjN2Q4OTQ4OGI0YzlmMjVmZjE4MjY3ODkxMmE0YjkwNy5qcGc6CyD///////////8BMhcIARITMjAyNS0wNy0yOSAyMzo1OTo1ORrNAwjnyMIDEkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS9mZWNhYTQ3ZTQ2ODljOWVmYTg0MzBiNmViNzRmNTM2ZTMxN2ZmODYwLmpwZxoBOCIV5byl6IC26IC26IC26IC26IC26IC2KAIwAkLbAgjnyMIDEroCChXlvKXogLbogLbogLbogLbogLbogLYSSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlL2ZlY2FhNDdlNDY4OWM5ZWZhODQzMGI2ZWI3NGY1MzZlMzE3ZmY4NjAuanBnKmMKFeW8peiAtuiAtuiAtuiAtuiAtuiAthJKaHR0cHM6Ly9pMS5oZHNsYi5jb20vYmZzL2ZhY2UvZmVjYWE0N2U0Njg5YzllZmE4NDMwYjZlYjc0ZjUzNmUzMTdmZjg2MC5qcGcyYwoV5byl6IC26IC26IC26IC26IC26IC2EkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS9mZWNhYTQ3ZTQ2ODljOWVmYTg0MzBiNmViNzRmNTM2ZTMxN2ZmODYwLmpwZzoLIP///////////wEyFwgCEhMyMDI1LTA4LTAzIDIzOjU5OjU5GvUDCMTF4wQSS2h0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzcxMmMzNjExMzg1ZTJlMGRjYmU4MDc2YmRkM2ViNmYwZWNjNmZkYWYud2VicBoBNiIe5oKg5ZOJ55qE6buR5ZCs5aSn546L5aSq5Zuw6L69KAMwA0L5AgjExeMEEtgCCh7mgqDlk4nnmoTpu5HlkKzlpKfnjovlpKrlm7Dovr0SS2h0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzcxMmMzNjExMzg1ZTJlMGRjYmU4MDc2YmRkM2ViNmYwZWNjNmZkYWYud2VicCptCh7mgqDlk4nnmoTpu5HlkKzlpKfnjovlpKrlm7Dovr0SS2h0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzcxMmMzNjExMzg1ZTJlMGRjYmU4MDc2YmRkM2ViNmYwZWNjNmZkYWYud2VicDJtCh7mgqDlk4nnmoTpu5HlkKzlpKfnjovlpKrlm7Dovr0SS2h0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzcxMmMzNjExMzg1ZTJlMGRjYmU4MDc2YmRkM2ViNmYwZWNjNmZkYWYud2VicDoLIP///////////wEyFwgDEhMyMDI1LTA3LTI2IDIzOjU5OjU5GtkDCLzSxwkSSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzAyMGYxOWEwNTNjZDBkNGZjNGMyYmQzOTlmYWNjMTk3YWJiZWY5N2EuanBnGgE2IhjmuLjmiYvlpb3pl7LnmoTmtYXogIHluIgoBDADQuQCCLzSxwkSwwIKGOa4uOaJi+WlvemXsueahOa1heiAgeW4iBJKaHR0cHM6Ly9pMS5oZHNsYi5jb20vYmZzL2ZhY2UvMDIwZjE5YTA1M2NkMGQ0ZmM0YzJiZDM5OWZhY2MxOTdhYmJlZjk3YS5qcGcqZgoY5ri45omL5aW96Zey55qE5rWF6ICB5biIEkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS8wMjBmMTlhMDUzY2QwZDRmYzRjMmJkMzk5ZmFjYzE5N2FiYmVmOTdhLmpwZzJmChjmuLjmiYvlpb3pl7LnmoTmtYXogIHluIgSSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzAyMGYxOWEwNTNjZDBkNGZjNGMyYmQzOTlmYWNjMTk3YWJiZWY5N2EuanBnOgsg////////////ATIXCAMSEzIwMjUtMDgtMDQgMjM6NTk6NTkakAMIp9P+CRJKaHR0cHM6Ly9pMS5oZHNsYi5jb20vYmZzL2ZhY2UvZTJkYmM4ZTQ5NzA3NzFiNjlhNWEyYzYzMDI0YTg5NzhjMjc3YWNmMi5qcGcaATYiDOmaj+WFieaykOW9sSgFQqkCCKfT/gkSnwIKDOmaj+WFieaykOW9sRJKaHR0cHM6Ly9pMS5oZHNsYi5jb20vYmZzL2ZhY2UvZTJkYmM4ZTQ5NzA3NzFiNjlhNWEyYzYzMDI0YTg5NzhjMjc3YWNmMi5qcGcqWgoM6ZqP5YWJ5rKQ5b2xEkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS9lMmRiYzhlNDk3MDc3MWI2OWE1YTJjNjMwMjRhODk3OGMyNzdhY2YyLmpwZzJaCgzpmo/lhYnmspDlvbESSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlL2UyZGJjOGU0OTcwNzcxYjY5YTVhMmM2MzAyNGE4OTc4YzI3N2FjZjIuanBnOgsg////////////ATIAGrYDCPWvn4sBEkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS80ZTNkYTdmYWJiOWZlMTkyNzRhYmQ0ZTdlYWMyNmQ3MjI4OGQyNmEwLmpwZxoBNiIV5pKS5qyi5YS/55qE5rCU5rOh5YS/KAZCxQII9a+fiwESugIKFeaSkuasouWEv+eahOawlOazoeWEvxJKaHR0cHM6Ly9pMS5oZHNsYi5jb20vYmZzL2ZhY2UvNGUzZGE3ZmFiYjlmZTE5Mjc0YWJkNGU3ZWFjMjZkNzIyODhkMjZhMC5qcGcqYwoV5pKS5qyi5YS/55qE5rCU5rOh5YS/EkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS80ZTNkYTdmYWJiOWZlMTkyNzRhYmQ0ZTdlYWMyNmQ3MjI4OGQyNmEwLmpwZzJjChXmkpLmrKLlhL/nmoTmsJTms6HlhL8SSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzRlM2RhN2ZhYmI5ZmUxOTI3NGFiZDRlN2VhYzI2ZDcyMjg4ZDI2YTAuanBnOgsg////////////ATIAGusDCPTXwbEBEkpodHRwczovL2kxLmhkc2xiLmNvbS9iZnMvZmFjZS8yN2RiOGQ5MTY3ZDRhMmUyMDg0NjUzNDJkOGVmZjQzZWUzMGJiOGNlLmpwZxoBNiIc57OW5b+D6JuL6JuLLeWNg+WNg+azoue6r+WGoCgHMANC8QII9NfBsQESzwIKHOezluW/g+ibi+ibiy3ljYPljYPms6Lnuq/lhqASSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzI3ZGI4ZDkxNjdkNGEyZTIwODQ2NTM0MmQ4ZWZmNDNlZTMwYmI4Y2UuanBnKmoKHOezluW/g+ibi+ibiy3ljYPljYPms6Lnuq/lhqASSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzI3ZGI4ZDkxNjdkNGEyZTIwODQ2NTM0MmQ4ZWZmNDNlZTMwYmI4Y2UuanBnMmoKHOezluW/g+ibi+ibiy3ljYPljYPms6Lnuq/lhqASSmh0dHBzOi8vaTEuaGRzbGIuY29tL2Jmcy9mYWNlLzI3ZGI4ZDkxNjdkNGEyZTIwODQ2NTM0MmQ4ZWZmNDNlZTMwYmI4Y2UuanBnOgsg////////////ATIXCAMSEzIwMjUtMDctMjUgMjM6NTk6NTk="
+	}
 }
 ```
 
